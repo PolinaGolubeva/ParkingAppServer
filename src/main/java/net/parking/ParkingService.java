@@ -5,12 +5,13 @@ import dbservice.objects.Parking;
 import dbservice.services.DBService;
 import net.notifiers.Listener;
 import net.notifiers.Manager;
+import net.utils.MessageGenerator;
 
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ParkingService {
+public class ParkingService implements Listener<Order>{
     private DBService<Parking> parkingDBService;
     private Set<ParkingWebSocket> webSockets;
 
@@ -40,4 +41,22 @@ public class ParkingService {
 
     public DBService<Parking> getDBService() { return parkingDBService; }
 
+    @Override
+    public void update(String message) {
+        Order order = Order.fromJson(message);
+        Long parkingId = order.getParkingId();
+        Parking parking = parkingDBService.get(parkingId);
+        Parking parking1 = new Parking(parkingId, parking.getCoordinates(),
+                parking.getInfo(), parking.getCapacity(), parking.getAvailable() - 1);
+        parkingDBService.update(parking1);
+        System.out.println("Parking " + parking1.getId() + " updated");
+        for (ParkingWebSocket p: webSockets) {
+            if (p.getId().equals(parkingId)) {
+                String data = MessageGenerator.SEND_ORDER + message;
+                p.sendString(data);
+                data = MessageGenerator.SEND_PARKING + parking1.toString();
+                p.sendString(data);
+            }
+        }
+    }
 }

@@ -24,14 +24,14 @@ public class ParkingWebSocket {
 
     @OnWebSocketConnect
     public void onOpen(Session session) {
-        System.out.println("Connection opened");
+        System.out.println("Connection with parking opened");
         parkingService.add(this);
         this.session = session;
     }
 
     @OnWebSocketMessage
     public void onMessage(String data) {
-        System.out.println("Message received: " + data);
+        System.out.println("Message from parking received: " + data);
         String message = "";
         if (data.startsWith(MessageGenerator.GET_ID)) {
             getParkingId(data);
@@ -83,6 +83,8 @@ public class ParkingWebSocket {
                     parking.getInfo(), parking.getCapacity(), parking.getAvailable() - 1);
             if (pService.update(newParking) == null) {
                 String msg = MessageGenerator.ERROR + "Error while updating parking";
+            } else {
+                System.out.println("Parking updated successfully");
             }
         }
     }

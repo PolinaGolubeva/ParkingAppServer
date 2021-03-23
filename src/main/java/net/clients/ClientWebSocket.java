@@ -25,7 +25,7 @@ public class ClientWebSocket {
 
     @OnWebSocketConnect
     public void onOpen(Session session) {
-        System.out.println("Connection established");
+        System.out.println("Connection with client established");
         clientService.add(this);
         this.session = session;
     }
@@ -33,11 +33,7 @@ public class ClientWebSocket {
     @OnWebSocketMessage
     public void onMessage(String data) {
         System.out.println("Message received from client: " + data);
-        System.out.flush();
-        System.out.println(data.equals(MessageGenerator.GET_ALL_PARKINGS));
-        System.out.println(data.startsWith(MessageGenerator.GET_ALL_PARKINGS));
-        System.out.flush();
-        if (data.equals(MessageGenerator.GET_ALL_PARKINGS)) {
+        if (data.startsWith(MessageGenerator.GET_ALL_PARKINGS)) {
             sendAllParkings();
         }
         if (data.startsWith(MessageGenerator.SEND_ORDER)) {
@@ -59,8 +55,8 @@ public class ClientWebSocket {
     }
 
     public void sendAllParkings() {
-        List<Parking> pList = clientService.getDBService().getAll();
-        String msg = MessageGenerator.GET_ALL_PARKINGS;
+        List<Parking> pList = clientService.getParkingDBService().getAll();
+        String msg = MessageGenerator.SEND_ALL_PARKINGS;
         String json = (new Gson().toJson(pList));
         msg += json;
         clientService.sendMessage(msg, this);
@@ -71,8 +67,10 @@ public class ClientWebSocket {
         String msg = data.replace(MessageGenerator.SEND_ORDER, "");
         try {
             Order order = Order.fromJson(msg);
+            System.out.println("Order id:" + order.getId());
             String response = MessageGenerator.MESSAGE + "Order received";
             System.out.println(response + order.toString());
+            clientService.getOrderDBService().insert(order);
         } catch (JsonParseException e) {
             String response = MessageGenerator.ERROR + "Error: order was not received, wrong format";
         } catch (NullPointerException e) {

@@ -1,3 +1,4 @@
+import dbservice.objects.Order;
 import dbservice.objects.Parking;
 import dbservice.services.DBService;
 import dbservice.services.ParkingServiceImpl;
@@ -11,10 +12,12 @@ public class ServerApp {
         //Connection connection = ParkingServiceImpl.getConnection();
         //DBService<Parking> parkingDBService = new ParkingServiceImpl(connection);
         DBService<Parking> parkingDBService = new TestParkingService();
+        DBService<Order> orderDBService = new TestOrderService();
         parkingDBService.createTable();
+        orderDBService.createTable();
         ParkingServer parkingServer = new ParkingServer(parkingDBService);
         parkingServer.init();
-        AndroidServer androidServer = new AndroidServer(parkingDBService);
+        AndroidServer androidServer = new AndroidServer(parkingDBService, orderDBService);
         androidServer.init();
     }
 }

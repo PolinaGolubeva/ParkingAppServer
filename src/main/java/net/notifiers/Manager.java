@@ -18,7 +18,7 @@ public class Manager<T> {
         this.listeners.remove(listener);
     }
 
-    public void notify(String message) {
+    public void updateAll(String message) {
         for (Listener listener : listeners)
             listener.update(message);
     }

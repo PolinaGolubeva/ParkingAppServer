@@ -1,6 +1,7 @@
 package dbservice.objects;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import exceptions.ModelException;
 
@@ -38,7 +39,8 @@ public class Parking {
     public int getAvailable() { return available; }
 
     public String toString() {
-        return new Gson().toJson(this);
+        Gson gson = new GsonBuilder().serializeNulls().create();
+        return gson.toJson(this);
     }
 
     public static Parking fromJson(String json) {

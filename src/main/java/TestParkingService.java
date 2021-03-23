@@ -36,6 +36,7 @@ public class TestParkingService implements DBService<Parking> {
         pList.add(obj);
         try {
             obj.setId((long) (pList.size() - 1));
+            manager.updateAll(obj.toString());
             return obj.getId();
         } catch (ModelException e) {
             //e.printStackTrace();
@@ -59,6 +60,7 @@ public class TestParkingService implements DBService<Parking> {
             if (pList.get(i).getId() == obj.getId()) {
                 pList.remove(i);
                 pList.add(i, obj);
+                manager.updateAll(obj.toString());
                 return Long.valueOf(i);
             }
         }

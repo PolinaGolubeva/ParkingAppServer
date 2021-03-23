@@ -79,7 +79,7 @@ public class ParkingServiceImpl implements DBService<Parking> {
     public Long update(Parking parking) {
         try {
             Long id =  new ParkingDAO(connection).update(parking);
-            getManager().notify(parking.toString());
+            getManager().updateAll(parking.toString());
             return id;
         } catch (SQLException throwables) {
             throwables.printStackTrace();
