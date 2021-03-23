@@ -20,13 +20,11 @@ public class ClientService implements Listener<Parking> {
     }
 
     public void sendMessage(String data, ClientWebSocket socket) {
-        //for (ClientWebSocket user : webSockets) {
             try {
                 socket.sendString(data);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
-        //}
     }
 
     public void add(ClientWebSocket webSocket) {

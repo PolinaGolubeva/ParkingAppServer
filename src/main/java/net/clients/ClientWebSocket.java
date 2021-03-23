@@ -1,6 +1,7 @@
 package net.clients;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import dbservice.objects.Order;
 import dbservice.objects.Parking;
 import net.utils.MessageGenerator;
@@ -31,13 +32,16 @@ public class ClientWebSocket {
 
     @OnWebSocketMessage
     public void onMessage(String data) {
-        System.out.println("Message received: " + data);
-        String message = "";
-        if (data.startsWith(MessageGenerator.GET_ALL_PARKINGS)) {
-            getAllParkings();
+        System.out.println("Message received from client: " + data);
+        System.out.flush();
+        System.out.println(data.equals(MessageGenerator.GET_ALL_PARKINGS));
+        System.out.println(data.startsWith(MessageGenerator.GET_ALL_PARKINGS));
+        System.out.flush();
+        if (data.equals(MessageGenerator.GET_ALL_PARKINGS)) {
+            sendAllParkings();
         }
         if (data.startsWith(MessageGenerator.SEND_ORDER)) {
-            sendOrder(data);
+            getOrder(data);
         }
     }
 
@@ -54,17 +58,25 @@ public class ClientWebSocket {
         }
     }
 
-    public void getAllParkings() {
+    public void sendAllParkings() {
         List<Parking> pList = clientService.getDBService().getAll();
         String msg = MessageGenerator.GET_ALL_PARKINGS;
         String json = (new Gson().toJson(pList));
         msg += json;
         clientService.sendMessage(msg, this);
+        System.out.println("All parkings sent: " + msg);
     }
 
-    private void sendOrder(String data) {
+    private void getOrder(String data) {
         String msg = data.replace(MessageGenerator.SEND_ORDER, "");
-        Order order = Order.fromJson(msg);
-
+        try {
+            Order order = Order.fromJson(msg);
+            String response = MessageGenerator.MESSAGE + "Order received";
+            System.out.println(response + order.toString());
+        } catch (JsonParseException e) {
+            String response = MessageGenerator.ERROR + "Error: order was not received, wrong format";
+        } catch (NullPointerException e) {
+            String response = MessageGenerator.ERROR + "Error: empty order";
+        }
     }
 }
