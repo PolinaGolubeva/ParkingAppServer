@@ -1,4 +1,4 @@
-# ServerTest
+# Parking App Server
 Server for parking application (test version)
 
 Запуск сервера:
