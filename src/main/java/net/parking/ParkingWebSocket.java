@@ -3,6 +3,7 @@ package net.parking;
 import dbservice.objects.Coordinates;
 import dbservice.objects.Parking;
 import dbservice.services.DBService;
+import exceptions.ModelException;
 import net.utils.MessageGenerator;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
@@ -79,10 +80,15 @@ public class ParkingWebSocket {
             System.out.println("Received add message:" + data);
             DBService<Parking> pService = parkingService.getDBService();
             Parking parking = pService.get(id);
-            Parking newParking = new Parking(parking.getId(), parking.getCoordinates(),
-                    parking.getInfo(), parking.getCapacity(), parking.getAvailable() - 1);
-            if (pService.update(newParking) == null) {
+            try {
+                parking.addCar();
+            } catch (ModelException e) {
+                String msg = MessageGenerator.ERROR + "Cannot add car: parking is full";
+                parkingService.sendMessage(id, msg);
+            }
+            if (pService.update(parking) == null) {
                 String msg = MessageGenerator.ERROR + "Error while updating parking";
+                parkingService.sendMessage(id, msg);
             } else {
                 System.out.println("Parking updated successfully");
             }
@@ -95,10 +101,15 @@ public class ParkingWebSocket {
             System.out.println("Received remove message:" + data);
             DBService<Parking> pService = parkingService.getDBService();
             Parking parking = pService.get(id);
-            Parking newParking = new Parking(parking.getId(), parking.getCoordinates(),
-                    parking.getInfo(), parking.getCapacity(), parking.getAvailable() + 1);
-            if (pService.update(newParking) == null) {
+            try {
+                parking.removeCar();
+            } catch (ModelException e) {
+                String msg = MessageGenerator.ERROR + "Cannot remove car: parking is empty";
+                parkingService.sendMessage(id, msg);
+            }
+            if (pService.update(parking) == null) {
                 String msg = MessageGenerator.ERROR + "Error while updating parking";
+                parkingService.sendMessage(id, msg);
             }
         }
     }

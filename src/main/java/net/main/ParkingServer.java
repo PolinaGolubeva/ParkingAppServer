@@ -1,5 +1,6 @@
 package net.main;
 
+import dbservice.objects.Order;
 import dbservice.objects.Parking;
 import dbservice.services.DBService;
 import net.parking.WebSocketParkingServlet;
@@ -12,17 +13,20 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 public class ParkingServer implements Runnable {
     private DBService<Parking> parkingDBService;
+    private DBService<Order> orderDBService;
     private Server server;
 
-    public ParkingServer(DBService<Parking> parkingDBService) {
+    public ParkingServer(DBService<Parking> parkingDBService, DBService<Order> orderDBService) {
         this.parkingDBService = parkingDBService;
+        this.orderDBService = orderDBService;
     }
 
     public void init() throws Exception {
         server = new Server(8081);
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
 
-        context.addServlet(new ServletHolder(new WebSocketParkingServlet(this.parkingDBService)), "/parking");
+        context.addServlet(new ServletHolder(new WebSocketParkingServlet(this.parkingDBService,
+                this.orderDBService)), "/parking");
 
         ResourceHandler resource_handler = new ResourceHandler();
         resource_handler.setDirectoriesListed(true);

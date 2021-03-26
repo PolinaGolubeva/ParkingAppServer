@@ -1,5 +1,6 @@
 package net.parking;
 
+import dbservice.objects.Order;
 import dbservice.objects.Parking;
 import dbservice.services.DBService;
 import org.eclipse.jetty.websocket.servlet.WebSocketServlet;
@@ -12,8 +13,8 @@ public class WebSocketParkingServlet extends WebSocketServlet {
     private final static int LOGOUT_TIME = 10 * 60 * 1000;
     private final ParkingService parkingService;
 
-    public WebSocketParkingServlet(DBService<Parking> parkingDBService) {
-        this.parkingService = new ParkingService(parkingDBService);
+    public WebSocketParkingServlet(DBService<Parking> parkingDBService, DBService<Order> orderDBService) {
+        this.parkingService = new ParkingService(parkingDBService, orderDBService);
     }
 
     @Override

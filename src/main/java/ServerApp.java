@@ -18,12 +18,15 @@ public class ServerApp {
         //DBService<Order> orderDBService = new OrderServiceImpl(connection);
         DBService<Parking> parkingDBService = new TestParkingService();
         DBService<Order> orderDBService = new TestOrderService();
-        //parkingDBService.cleanUp();
-        //orderDBService.cleanUp();
+        parkingDBService.cleanUp();
+        orderDBService.cleanUp();
         parkingDBService.createTable();
+        for (Parking p: parkingDBService.getAll()) {
+            System.out.println(p.toString());
+        }
         orderDBService.createTable();
         readTable("./parkings/ParkingBook.txt",parkingDBService);
-        ParkingServer parkingServer = new ParkingServer(parkingDBService);
+        ParkingServer parkingServer = new ParkingServer(parkingDBService, orderDBService);
         parkingServer.init();
         AndroidServer androidServer = new AndroidServer(parkingDBService, orderDBService);
         androidServer.init();

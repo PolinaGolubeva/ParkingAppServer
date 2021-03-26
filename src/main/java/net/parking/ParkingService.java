@@ -3,6 +3,7 @@ package net.parking;
 import dbservice.objects.Order;
 import dbservice.objects.Parking;
 import dbservice.services.DBService;
+import exceptions.ModelException;
 import net.notifiers.Listener;
 import net.utils.MessageGenerator;
 
@@ -12,11 +13,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ParkingService implements Listener<Order>{
     private DBService<Parking> parkingDBService;
+    private DBService<Order> orderDBService;
     private Set<ParkingWebSocket> webSockets;
 
-    public ParkingService(DBService<Parking> parkingDBService) {
+    public ParkingService(DBService<Parking> parkingDBService, DBService<Order> orderDBService) {
         this.parkingDBService = parkingDBService;
+        this.orderDBService = orderDBService;
         this.webSockets = Collections.newSetFromMap(new ConcurrentHashMap<>());
+        orderDBService.getManager().subscribe(this);
     }
 
     public void sendMessage(Long id, String data) {
@@ -45,16 +49,20 @@ public class ParkingService implements Listener<Order>{
         Order order = Order.fromJson(message);
         Long parkingId = order.getParkingId();
         Parking parking = parkingDBService.get(parkingId);
-        Parking parking1 = new Parking(parkingId, parking.getCoordinates(),
-                parking.getInfo(), parking.getCapacity(), parking.getAvailable() - 1);
-        parkingDBService.update(parking1);
-        System.out.println("Parking " + parking1.getId() + " updated");
+        try {
+            parking.addCar();
+        } catch (ModelException e) {
+            e.printStackTrace();
+        }
+        parkingDBService.update(parking);
+        System.out.println("Parking " + parking.getId() + " updated");
         for (ParkingWebSocket p: webSockets) {
             if (p.getId().equals(parkingId)) {
                 String data = MessageGenerator.SEND_ORDER + message;
                 p.sendString(data);
-                data = MessageGenerator.SEND_PARKING + parking1.toString();
+                data = MessageGenerator.SEND_PARKING + parking.toString();
                 p.sendString(data);
+                break;
             }
         }
     }

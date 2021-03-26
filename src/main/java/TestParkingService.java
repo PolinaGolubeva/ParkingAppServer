@@ -1,7 +1,9 @@
 import dbservice.objects.Coordinates;
+import dbservice.objects.Order;
 import dbservice.objects.Parking;
 import dbservice.services.DBService;
 import exceptions.ModelException;
+import net.notifiers.Listener;
 import net.notifiers.Manager;
 
 import java.util.ArrayList;
@@ -19,6 +21,7 @@ public class TestParkingService implements DBService<Parking> {
     @Override
     public void createTable() {
         pList = new ArrayList<Parking>();
+        /*
         String info = "here comes address and cost information ";
         Random random = new Random();
         for (int i = 0; i < 20; i++) {
@@ -29,6 +32,7 @@ public class TestParkingService implements DBService<Parking> {
             Parking parking = new Parking((long)i, coords, info + i, capacity, available);
             pList.add(parking);
         }
+        */
     }
 
     @Override
@@ -86,4 +90,5 @@ public class TestParkingService implements DBService<Parking> {
     public Manager<Parking> getManager() {
         return manager;
     }
+
 }

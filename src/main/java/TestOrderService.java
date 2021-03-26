@@ -1,12 +1,14 @@
 import dbservice.objects.Order;
+import dbservice.objects.Parking;
 import dbservice.services.DBService;
 import exceptions.ModelException;
+import net.notifiers.Listener;
 import net.notifiers.Manager;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestOrderService implements DBService<Order> {
+public class TestOrderService implements DBService<Order>{
     private List<Order> orderList;
     private Manager<Order> manager;
 
@@ -24,6 +26,7 @@ public class TestOrderService implements DBService<Order> {
         orderList.add(obj);
         try {
             obj.setId((long) (orderList.size() - 1));
+            manager.updateAll(obj.toString());
         } catch (ModelException e) {
             e.printStackTrace();
         }
@@ -72,4 +75,5 @@ public class TestOrderService implements DBService<Order> {
     public Manager<Order> getManager() {
         return this.manager;
     }
+
 }

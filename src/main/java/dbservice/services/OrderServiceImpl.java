@@ -33,7 +33,9 @@ public class OrderServiceImpl implements DBService<Order> {
         OrderDAO dao = new OrderDAO(connection);
         try {
             dao.createTable();
-            return dao.insert(order);
+            Long id = dao.insert(order);
+            manager.updateAll(order.toString());
+            return id;
         } catch (SQLException | ModelException | DBException e) {
             try {
                 connection.rollback();
@@ -63,6 +65,7 @@ public class OrderServiceImpl implements DBService<Order> {
 
     public Long update(Order order) {
         try {
+            manager.updateAll(order.toString());
             return (new OrderDAO(connection).update(order));
         } catch (SQLException e) {
             e.printStackTrace();
