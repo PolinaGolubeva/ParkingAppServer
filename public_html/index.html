@@ -8,7 +8,7 @@
         function init() {
             ws = new WebSocket("ws://localhost:8081/parking");
             ws.onopen = function (event) {
-                alert('Connection established');
+                document.getElementById("body").style.visibility = 'hidden';
             }
 
             ws.onmessage = function (event) {
@@ -16,6 +16,8 @@
                 if (msg.startsWith('send|parking|')) {
                     let parking = msg.replace('send|parking|','');
                     parseParking(parking);
+                    document.getElementById("startForm").style.visibility = 'hidden';
+                    document.getElementById("body").style.visibility = 'visible';
                 }
                 if (msg.startsWith('err|')) {
                     alert(msg);
@@ -38,7 +40,6 @@
         function sendId() {
             let idField = document.getElementById("parkingId");
             let message = 'id|'+idField.value;
-            alert('Id message sent');
             ws.send(message);
         }
 
@@ -75,7 +76,6 @@
             document.getElementById("parkId").textContent = parking.id;
             document.getElementById("coords").textContent =
                 parking.coordinates.latitude + ", " + parking.coordinates.longitude;
-            document.getElementById("info").textContent = parking.info;
             document.getElementById("capacity").textContent = parking.capacity;
             document.getElementById("available").textContent = parking.available;
         }
@@ -95,8 +95,6 @@
         <div id="parkId"></div>
         <p>Coordinates: </p>
         <div id="coords"></div>
-        <p> Info: </p>
-        <div id="info"></div>
         <p>Capacity: </p>
         <div id="capacity"></div>
         <p>Available: </p>

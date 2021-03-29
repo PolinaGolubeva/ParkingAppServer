@@ -8,6 +8,8 @@ import net.main.AndroidServer;
 import net.main.ParkingServer;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.util.Locale;
 
@@ -47,7 +49,7 @@ public class ServerApp {
 
     public static void readTable(String filename, DBService<Parking> parkingDBService) {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(filename));
+            BufferedReader reader = new BufferedReader(new FileReader(filename, Charset.forName("UTF-8")));
             for (int i = 0; i < 10; i++) {
                 String line = reader.readLine();
                 String subs[] = line.split("\\|");
